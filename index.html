@@ -14,7 +14,7 @@ Created by pixpalette.com - online design magazine -->
     <link href="css/custom.css" rel="stylesheet">
     
     <!-- fonts -->
-    <link href='http://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Nixie+One' rel='stylesheet' type='text/css'>
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,900" rel="stylesheet">
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -68,7 +68,7 @@ Created by pixpalette.com - online design magazine -->
                                     <div class="row">
  			                       	<div class="col-xs-6">
             							<div class="ticket-name">
-                                        	Platinum
+                                        	General Admision
                                             <span>Standing<br>
                                         	1 Ticket for 1 person</span>
                                         </div>
@@ -98,7 +98,7 @@ Created by pixpalette.com - online design magazine -->
                                 	
                                     
                                     <div class="ticket-description">
-                                    	<p><strong>Please refer Venue Plan:</strong><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam</p>
+                                    	<p><strong>Please refer Venue Plan:</strong><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim venia.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.</p>
                                     </div>
                                             
                                 </div>
@@ -169,19 +169,19 @@ Created by pixpalette.com - online design magazine -->
             <div class="contactForm">	
                 <h3>Contact Details</h3>
                 <form>
+                                   
                   <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Enter your Full Name">
+				   <label for="emailInput">Email</label>
+                    <input type="text" class="form-control" id="emailInput" placeholder="Enter your Email Address">
                   </div>
                   
-                  <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Enter your Email Address">
-                  </div>
-                  
-                  <div class="form-group">
-                     <input type="text" class="form-control" placeholder="Enter your Mobile No.">
-                  </div>
-                  
-        		  <a type="submit" class="btn">Complete Booking</a>
+				   <div class="form-group">
+				    <label for="referenceInput">Reference</label>
+                    <input type="text" class="form-control" id="referenceInput" placeholder="Enter your Reference Code">
+                  </div>                  
+        		  <!-- <a type="submit" class="btn">Complete Booking</a> -->
+				  <a href="#" id="completeBooking" class="btn">Complete Booking</a>
+
                 </form>
             </div>
         
@@ -198,5 +198,72 @@ Created by pixpalette.com - online design magazine -->
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/allscript.js"></script>
+	<script>
+	
+       // Function to decode Base64-encoded string
+        function decodeParam(encodedString) {
+            const decodedString = atob(encodedString);
+            return decodedString;
+        }
+
+        // Get the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const emailParam = urlParams.get('code');
+        const idParam = urlParams.get('id');
+
+        // Decode and set the email and id in the input fields
+        const emailInput = document.getElementById('emailInput');
+        const referenceInput = document.getElementById('referenceInput');
+
+        // Check if emailParam and idParam have values
+        if (emailParam) {
+            const decodedEmail = decodeParam(emailParam);
+            emailInput.value = decodedEmail;
+            emailInput.readOnly = true; // Set as read-only
+        }
+
+        if (idParam) {
+            const decodedId = decodeParam(idParam);
+            referenceInput.value = decodedId;
+            referenceInput.readOnly = true; // Set as read-only
+        }
+	</script>
+	<script>
+       document.getElementById('completeBooking').addEventListener('click', function (e) {
+    e.preventDefault();
+
+
+            // Get values from input fields
+            var emailInput = document.getElementById('emailInput').value;
+            var referenceInput = document.getElementById('referenceInput').value;
+
+            // Create JSON object
+            var data = {
+                "TicketNumber": emailInput,
+                "Reference": referenceInput
+            };
+
+            // Send POST request to Google Apps Script webhook
+            fetch('https://worker-email-register-event.krishgkrish.workers.dev/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(function (response) {
+                return response.text();
+            })
+            .then(function (result) {
+                // Display response in a popup
+                alert(result);
+            })
+            .catch(function (error) {
+                console.error('Error:', error);
+                // Display error message in a popup
+                alert('Error: Unable to submit the form.');
+            });
+        });
+    </script>
   </body>
 </html>
