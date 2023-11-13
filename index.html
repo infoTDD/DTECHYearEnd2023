@@ -199,30 +199,35 @@ Created by pixpalette.com - online design magazine -->
     <script src="js/bootstrap.min.js"></script>
     <script src="js/allscript.js"></script>
 	<script>
-		// Function to parse URL parameters
-		function getQueryParam(name) {
-			var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
-			return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
-		}
+	
+       // Function to decode Base64-encoded string
+        function decodeParam(encodedString) {
+            const decodedString = atob(encodedString);
+            return decodedString;
+        }
 
-		// Get the email and reference from URL parameters
-		const emailInput = document.getElementById('emailInput');
-		const referenceInput = document.getElementById('referenceInput');
+        // Get the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const emailParam = urlParams.get('code');
+        const idParam = urlParams.get('id');
 
-		const emailParam = getQueryParam('code');
-		const idParam = getQueryParam('id');
+        // Decode and set the email and id in the input fields
+        const emailInput = document.getElementById('emailInput');
+        const referenceInput = document.getElementById('referenceInput');
 
-		if (emailParam) {
-			emailInput.value = emailParam;
-			emailInput.readOnly = true; // Set as read-only
-		}
+        // Check if emailParam and idParam have values
+        if (emailParam) {
+            const decodedEmail = decodeParam(emailParam);
+            emailInput.value = decodedEmail;
+            emailInput.readOnly = true; // Set as read-only
+        }
 
-		if (idParam) {
-			referenceInput.value = idParam;
-			referenceInput.readOnly = true; // Set as read-only
-		}
+        if (idParam) {
+            const decodedId = decodeParam(idParam);
+            referenceInput.value = decodedId;
+            referenceInput.readOnly = true; // Set as read-only
+        }
 	</script>
-
 	<script>
        document.getElementById('completeBooking').addEventListener('click', function (e) {
     e.preventDefault();
