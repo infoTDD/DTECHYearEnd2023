@@ -69,7 +69,7 @@ Created by pixpalette.com - online design magazine -->
  			                       	<div class="col-xs-6">
             							<div class="ticket-name">
                                         	General Admision
-                                            <span>Standing<br>
+                                            <span><br>
                                         	1 Ticket for 1 person</span>
                                         </div>
             						</div>
@@ -183,6 +183,9 @@ Created by pixpalette.com - online design magazine -->
 				  <a href="#" id="completeBooking" class="btn">Complete Booking</a>
 
                 </form>
+			<div id="bookingResult" class="text-center" style="margin-top: 20px; font-size: 18px; font-weight: bold;"></div>
+
+
             </div>
         
         
@@ -229,41 +232,55 @@ Created by pixpalette.com - online design magazine -->
         }
 	</script>
 	<script>
-       document.getElementById('completeBooking').addEventListener('click', function (e) {
-    e.preventDefault();
+    // ... Previous JavaScript code ...
 
+    document.getElementById('completeBooking').addEventListener('click', function (e) {
+        e.preventDefault();
 
-            // Get values from input fields
-            var emailInput = document.getElementById('emailInput').value;
-            var referenceInput = document.getElementById('referenceInput').value;
+        // Get values from input fields
+        var emailInput = document.getElementById('emailInput').value;
+        var referenceInput = document.getElementById('referenceInput').value;
 
-            // Create JSON object
-            var data = {
-                "TicketNumber": emailInput,
-                "Reference": referenceInput
-            };
+        // Create JSON object
+        var data = {
+            "TicketNumber": emailInput,
+            "Reference": referenceInput
+        };
+		// Reference to the completeBooking button
+		var completeBookingButton = document.getElementById('completeBooking');
+		
+		// Disable the button and change its text
+		completeBookingButton.innerHTML = 'Processing...'; // Change the text
 
-            // Send POST request to Google Apps Script webhook
-            fetch('https://worker-email-register-event.krishgkrish.workers.dev/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(function (response) {
-                return response.text();
-            })
-            .then(function (result) {
-                // Display response in a popup
-                alert(result);
-            })
-            .catch(function (error) {
-                console.error('Error:', error);
-                // Display error message in a popup
-                alert('Error: Unable to submit the form.');
-            });
+        // Send POST request to Google Apps Script webhook
+        fetch('https://worker-email-register-event.krishgkrish.workers.dev/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+        .then(function (response) {
+            return response.text();
+        })
+        .then(function (result) {
+            // Display the API response in the result div
+            var bookingResultDiv = document.getElementById('bookingResult');
+            bookingResultDiv.innerHTML = 'Registration Status : ' + result + '<br>Thank you for registering!';
+			// Re-enable the button and change its text
+			completeBookingButton.innerHTML = 'Registration Complete'; // Change the text
+			completeBookingButton.setAttribute('disabled', 'true'); // Disable the button
+
+        })
+        .catch(function (error) {
+            console.error('Error:', error);
+            // Display error message in the result div
+            var bookingResultDiv = document.getElementById('bookingResult');
+            bookingResultDiv.innerHTML = 'Error: Unable to submit the form.';
+			// Re-enable the button and change its text
+			completeBookingButton.innerHTML = 'Complete Booking'; // Change the text back
         });
-    </script>
+    });
+</script>
   </body>
 </html>
