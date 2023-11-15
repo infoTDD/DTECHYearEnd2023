@@ -263,7 +263,7 @@ Created by pixpalette.com - online design magazine -->
 		
 		// Disable the button and change its text
 		completeBookingButton.innerHTML = 'Processing...'; // Change the text
-
+		completeBookingButton.setAttribute('disabled', 'true'); // Disable the button
         // Send POST request to Google Apps Script webhook
         fetch('https://worker-email-register-event.krishgkrish.workers.dev/', {
             method: 'POST',
@@ -291,6 +291,7 @@ Created by pixpalette.com - online design magazine -->
             bookingResultDiv.innerHTML = 'Error: Unable to submit the form.';
 			// Re-enable the button and change its text
 			completeBookingButton.innerHTML = 'Complete Booking'; // Change the text back
+			completeBookingButton.setAttribute('disabled', 'false'); // Disable the button
         });
     });
 </script>
