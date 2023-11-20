@@ -32,6 +32,296 @@
 			  margin: 10px auto;
 			}
 
+			 #cameraContainer {
+				width: 50%;
+				padding-top: 50%; /* Set the padding-top to make it square */
+				position: relative; /* Add this for absolute positioning of the video */
+				overflow: hidden;
+			}
+
+			#cameraPreview {
+				width: 100%;
+				height: 100%; /* Make the video fill the container */
+				position: absolute; /* Position the video absolutely within the container */
+				top: 0;
+				left: 0;
+			}
+
+			#frozenImage {
+			  display: none;
+			}
+
+			#responseMessage {
+			  font-size: 18px;
+			}
+
+			#manualEntryButton {
+			  background-color: black;
+			  color: yellow;
+			}
+		  </style>
+	</head>
+	<body>
+		<h1>AB InBev Africa Head Office Year End Celebration!</h1>
+		<label for="cameraSelect">Select a BACK Camera:</label>
+		<select id="cameraSelect"></select>
+		<br><br>
+		<div id="cameraContainer" style="width: 100%; height: 300px; overflow: hidden;">
+			<div id="cameraPreview"></div>
+			<img id="frozenImage" style="display: none;">
+		</div>
+		<br>
+		<button id="scanButton">Scan Next Ticket QR Code</button><br><br>
+		
+		<input type="text" id="barcodeInput" placeholder="Barcode/Reference" disabled>
+		<br><br>
+		<button id="submitButton" disabled>Submit Scan</button>
+		<div id="responseMessage"></div>
+		<br><br>
+		<button id="clearButton">Reset Scanner</button><br><br>
+		<br><br><br><br>
+		<button id="manualEntryButton">Manual Reference Entry</button>
+	
+	
+		<script src="https://cdn.rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
+		<script>
+			const scanButton = document.getElementById('scanButton');
+			const clearButton = document.getElementById('clearButton');
+			const manualEntryButton = document.getElementById('manualEntryButton');
+			const barcodeInput = document.getElementById('barcodeInput');
+			const submitButton = document.getElementById('submitButton');
+			const responseMessage = document.getElementById('responseMessage');
+			const cameraPreview = document.getElementById('cameraPreview');
+			const frozenImage = document.getElementById('frozenImage');
+			const cameraSelect = document.getElementById('cameraSelect');
+			let scanner = null;
+
+			// Function to freeze the camera preview as an image
+			function freezeCameraPreview() {
+				const video = scanner.video;
+				const canvas = document.createElement('canvas');
+				canvas.width = video.videoWidth;
+				canvas.height = video.videoHeight;
+				const ctx = canvas.getContext('2d');
+				ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+				frozenImage.src = canvas.toDataURL('image/png');
+				frozenImage.style.display = 'block';
+				video.style.display = 'none';
+			}
+
+			// Function to clear the input field and reset the camera preview
+		   
+			function resetScanner() {
+				if (scanner) {
+					if (cameraPreview.contains(scanner.video)) {
+								cameraPreview.removeChild(scanner.video);
+							}		
+					scanner.stop(); // Stop the scanner
+					scanner.removeListener('scan', handleScan); // Remove the existing listener
+					scanner.video.style.display = 'block';
+					scanner = null; // Reset the scanner variable
+					  // Check if scanner.video is a child of cameraPreview and remove it
+					  responseMessage.innerHTML ='Ready to Scan Next Ticket';
+        
+				}
+				
+				
+				frozenImage.style.display = 'none';
+				barcodeInput.value = '';
+				submitButton.disabled = true;
+				scanButton.innerHTML = 'Scan Next Ticket QR Code'; // Reset the button text
+				scanButton.disabled = false;
+				manualEntryButton.disabled = false;
+				
+			}
+
+			// Populate the camera selection dropdown
+			Instascan.Camera.getCameras().then(function (cameras) {
+				if (cameras.length > 0) {
+					cameras.forEach(function (camera, index) {
+						const option = document.createElement('option');
+						option.value = index;
+						option.text = camera.name;
+						cameraSelect.appendChild(option);
+					});
+					responseMessage.innerHTML ='Please select a BACK Camera.';
+				} else {
+				
+					console.error('No cameras found.');
+					responseMessage.innerHTML ='No cameras found.';
+				}
+			}).catch(function (error) {
+				console.error(error);
+				responseMessage.innerHTML = error;
+
+			});
+			
+				
+			function handleScan(content) {
+				barcodeInput.value = content;
+				freezeCameraPreview();
+				submitButton.disabled = false;
+				scanButton.innerHTML = 'Scan Complete'; // Change the text
+				responseMessage.innerHTML ='Please Submit Scan';
+				scanner.removeListener('scan', handleScan); // Remove the existing listener
+				if (scanner) {
+					scanner.stop(); // Stop the existing scanner
+					if (cameraPreview.contains(scanner.video)) {
+						cameraPreview.removeChild(scanner.video);
+					}
+					scanner = null; // Reset the scanner variable
+				}
+				
+			}
+
+
+			// Initialize the scanner when the "Scan QR Code" button is clicked
+			scanButton.addEventListener('click', () => {
+				const selectedCameraIndex = cameraSelect.value;
+				scanButton.innerHTML = 'Initializing Scanner'; // Change the text
+				scanButton.disabled = true;
+				barcodeInput.disabled = true;
+				manualEntryButton.disabled = true;
+
+				if (scanner) {
+					scanner.stop(); // Stop the existing scanner
+					if (cameraPreview.contains(scanner.video)) {
+						cameraPreview.removeChild(scanner.video);
+					}
+					scanner = null; // Reset the scanner variable
+					
+				}
+				
+
+				scanner = new Instascan.Scanner({
+					video: document.createElement('video'),
+					mirror: false,
+				});
+				scanner.video.autoplay = true;
+				cameraPreview.appendChild(scanner.video);
+
+				Instascan.Camera.getCameras().then(function (cameras) {
+					if (cameras.length > 0) {
+						scanner.start(cameras[selectedCameraIndex]);
+						responseMessage.innerHTML = 'Hold Still.Busy Scanning...'; // Change the text
+						scanner.addListener('scan', handleScan);
+					} else {
+						console.error('No cameras found.');
+						responseMessage.innerHTML ='No cameras found.';
+						alert('No cameras found.');
+					}
+				}).catch(function (error) {
+					console.error(error);
+					alert(error);
+					responseMessage.innerHTML =error;
+				});
+			});
+
+
+			// Clear button event listener
+			clearButton.addEventListener('click', () => {
+				
+				resetScanner();
+			});
+			
+			// Manual Entry button event listener
+			manualEntryButton.addEventListener('click', () => {
+				
+				resetScanner();
+				scanButton.disabled = true;
+				barcodeInput.disabled = false;
+				submitButton.disabled = false;
+				responseMessage.innerHTML ='Please Manually Enter Reference Code and Submit';
+				
+			});
+			
+			
+			
+
+			// Handle the form submission
+			submitButton.addEventListener('click', function (e) {
+        e.preventDefault();
+				
+				// Get values from input fields				
+				var referenceInput = barcodeInput.value;
+
+				// Create JSON object
+				var data = {
+					
+					"Reference": referenceInput
+				};
+				// Reference to the completeBooking button
+				
+				
+				// Disable the button and change its text
+				submitButton.innerHTML = 'Submitting...'; // Change the text
+				submitButton.setAttribute('disabled', 'true'); // Disable the button
+				responseMessage.innerHTML = 'Please wait.Busy Submitting';
+				// Send POST request to Google Apps Script webhook
+				fetch('https://worker-event-scan-ticket.krishgkrish.workers.dev/', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(data)
+				})
+				.then(function (response) {
+					return response.text();
+				})
+				.then(function (result) {
+					// Display the API response in the result div					
+					responseMessage.innerHTML = result + '<br> Tap "Reset Scanner" to continue.';
+					// Re-enable the button and change its text
+					submitButton.innerHTML = 'Submit Scan'; // Change the text
+					
+					submitButton.setAttribute('disabled', 'true'); // Disable the button
+
+				})
+				.catch(function (error) {
+					console.error('Error:', error);
+					// Display error message in the result div					
+					responseMessage.innerHTML = 'Error: Unable to submit the form.';
+					// Re-enable the button and change its text
+					submitButton.innerHTML = 'Re-Submit Scan'; // Change the text back
+					submitButton.setAttribute('disabled', 'false'); // Disable the button
+				});
+			});
+		</script>
+	</body>
+	</html>	<!DOCTYPE html>
+	<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>AB InBev Africa Head Office Year End Celebration!</title>
+		<style>
+		  html, body {
+			  background-color: yellow;
+			  color: black;
+			  text-align: center;
+			  height: 100%;
+			  margin: 0;
+			  padding: 0;
+			}
+
+
+			h1 {
+			  font-size: 24px;
+			}
+
+			label {
+			  font-size: 18px;
+			}
+
+			select,
+			input[type="text"],
+			button {
+			  width: 80%;
+			  padding: 10px;
+			  font-size: 18px;
+			  margin: 10px auto;
+			}
+
 			#cameraContainer {
 			  width: 50%;
 			  height: 200px;
