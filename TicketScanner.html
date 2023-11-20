@@ -16,11 +16,11 @@
 
 
 			h1 {
-			  font-size: 24px;
+			  font-size: 22px;
 			}
 
 			label {
-			  font-size: 18px;
+			  font-size: 12px;
 			}
 
 			select,
@@ -28,13 +28,14 @@
 			button {
 			  width: 80%;
 			  padding: 10px;
-			  font-size: 18px;
+			  font-size: 12px;
 			  margin: 10px auto;
 			}
 
 			#cameraContainer {
 				width: 80%;
-				max-width: 50px; /* Set a maximum width for the container */
+				max-width: 300px; /* Set a maximum width for the container */
+				max-height: 200px; /* Set a maximum height for the container */
 				height: 0;
 				padding-top: 100%; /* Maintain a 1:1 aspect ratio (square) */
 				position: relative;
@@ -66,25 +67,27 @@
 	</head>
 	<body>
 		<h1>AB InBev Africa Head Office Year End Celebration!</h1>
-		<label for="cameraSelect">Select a BACK Camera:</label>
-		<select id="cameraSelect"></select>
-		<br><br>
-		<div id="cameraContainer" style="width: 100%; height: 300px; overflow: hidden;">
+		
+		<br>
+		<div id="cameraContainer" >
 			<div id="cameraPreview"></div>
 			<img id="frozenImage" style="display: none;">
 		</div>
 		<br>
-		<button id="scanButton">Scan Next Ticket QR Code</button><br><br>
+		<button id="scanButton">Scan Next Ticket QR Code</button><br>
 		
 		<input type="text" id="barcodeInput" placeholder="Barcode/Reference" disabled>
-		<br><br>
+		<br>
 		<button id="submitButton" disabled>Submit Scan</button>
 		<div id="responseMessage"></div>
-		<br><br>
+		<br>
 		<button id="clearButton">Reset Scanner</button><br><br>
-		<br><br><br><br>
+		<br><br>
 		<button id="manualEntryButton">Manual Reference Entry</button>
-	
+		
+		<br><br>
+		<label for="cameraSelect">Setup : Select a BACK Camera:</label>
+		<select id="cameraSelect"></select>
 	
 		<script src="https://cdn.rawgit.com/schmich/instascan-builds/master/instascan.min.js"></script>
 		<script>
