@@ -32,17 +32,20 @@
 			  margin: 10px auto;
 			}
 
-			 #cameraContainer {
-				width: 50%;
-				padding-top: 50%; /* Set the padding-top to make it square */
-				position: relative; /* Add this for absolute positioning of the video */
+			#cameraContainer {
+				width: 80%;
+				max-width: 50px; /* Set a maximum width for the container */
+				height: 0;
+				padding-top: 100%; /* Maintain a 1:1 aspect ratio (square) */
+				position: relative;
 				overflow: hidden;
+				margin: 0 auto;
 			}
 
 			#cameraPreview {
 				width: 100%;
-				height: 100%; /* Make the video fill the container */
-				position: absolute; /* Position the video absolutely within the container */
+				height: 100%;
+				position: absolute;
 				top: 0;
 				left: 0;
 			}
